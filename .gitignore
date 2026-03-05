@@ -1,0 +1,64 @@
+
+`/Users/berkayaksu/flag-nest/.gitignore`
+```gitignore
+# macOS
+.DS_Store
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# --------------------
+# Rails (backend)
+# --------------------
+backend/.bundle/
+backend/vendor/bundle/
+backend/db/*.sqlite3
+backend/db/*.sqlite3-*
+backend/storage/*
+!backend/storage/.keep
+backend/tmp/*
+!backend/tmp/.keep
+backend/log/*
+!backend/log/.keep
+backend/public/assets
+backend/public/packs
+backend/node_modules/
+backend/config/master.key
+backend/.byebug_history
+
+# --------------------
+# Next.js (frontend)
+# --------------------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.env.local
+frontend/.env*.local
+frontend/coverage/
+
+# Build artifacts
+dist/
+build/
