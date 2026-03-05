@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const backend = process.env.NEXT_SERVER_API_BASE || 'http://localhost:3001';
 
-export const runtime = 'node.js';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function getSetCookies(headers: Headers): string[] {
