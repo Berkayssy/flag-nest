@@ -10,13 +10,29 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
 - `backend/` -> Rails API
 - `frontend/` -> Next.js app
 
-## Step 1 (Auth) Status
-Completed:
+
+## Progress Status
+
+### Step 1 (Auth & Cookie) `Completed`
 - JWT + HttpOnly cookie auth
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
 - `POST /api/v1/auth/logout`
-- Request spec: `spec/requests/auth_spec.rb` (5/5 passing)
+- Request spec: `backend/spec/requests/auth_spec.rb` (passing)
+
+### Step 2 (RBAC) `Completed`
+- Role guards in backend:
+  - `require_admin!`
+  - `require_manager_or_admin!`
+- Protected endpoints:
+  - `GET /api/v1/admin/ping`
+  - `GET /api/v1/manager/ping`
+- Backend RBAC request spec:
+  - `backend/spec/requests/rbac_spec.rb` (passing)
+- Frontend role-based dashboard visibility:
+  - `isAdmin`
+  - `isManagerOrAdmin`
+- Frontend dashboard role smoke tests (passing)
 
 ## Run Locally
 
@@ -41,6 +57,13 @@ cd backend
 bundle exec rspec spec/requests/auth_spec.rb
 ```
 
+```bash
+cd frontend
+npm run test:run
+npm run lint
+npm run build
+```
+
 ## Environment
 
 ### Backend (backend/.env or credentials)
@@ -51,8 +74,8 @@ bundle exec rspec spec/requests/auth_spec.rb
 - localhost(line 3001)
 
 ## Roadmap
-1. Auth & Cookie 
-2. RBAC
+1. Auth & Cookie `OK`
+2. RBAC `OK`
 3. Feature Flag CRUD
 4. Rollout rules
 5. Audit log
