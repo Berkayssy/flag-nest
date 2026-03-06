@@ -62,3 +62,11 @@ frontend/coverage/
 # Build artifacts
 dist/
 build/
+
+# local cookie dumps
+cookies*.txt
+backend/cookies*.txt
+
+# local cookie dumps
+cookies*.txt
+backend/cookies*.txt
