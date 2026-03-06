@@ -1,9 +1,11 @@
 class ApplicationController < ActionController::API
+    # Include cookie handling for authentication
     include ActionController::Cookies
     before_action :authenticate_request
 
     private
 
+    # Auth and JWT + Cookie handling methods
     def issue_auth_cookie(token)
         cookies[:auth_token] = {
             value: token,
@@ -21,9 +23,10 @@ class ApplicationController < ActionController::API
 
         begin
             decoded_token = decode_jwt(token)
-            @current_user = User.find_by(id: decoded_token["user_id"]) # JWT.decode return string hash keys
-        rescue JWT::DecodeError, ActiveRecord::RecordNotFound
-            render_error("Invalid or expired token", :unauthorized) unless @current_user&.is_active?
+            @current_user = User.find_by(id: decoded_token["user_id"]) # JWT.decode return string hash keys, if find_by returns nil, not RecordNotFound
+            render_error("Unauthorized", :unauthorized) unless @current_user&.is_active?
+        rescue JWT::DecodeError
+            render_error("Invalid or expired token", :unauthorized)
         end
     end
 
@@ -45,5 +48,15 @@ class ApplicationController < ActionController::API
 
     def render_success(data, status = :ok)
         render json: { data: data }, status: status
+    end
+
+    # RBAC helper methods
+    def require_admin!
+        render_error("Forbidden", :forbidden) unless current_user&.role == "admin" # Admin fieald is not avaliable in user model, we can use role field instead and check for admin role yet
+    end
+
+    def require_manager_or_admin!
+        allowed = %w[admin manager]
+        render_error("Forbidden", :forbidden) unless current_user && allowed.include?(current_user.role)
     end
 end

@@ -21,6 +21,7 @@ RSpec.describe "Auth API", type: :request do
         )
     end
 
+    # Login tests
     describe "POST /api/v1/auth/login" do
         it "returns 200 with valid credentials" do
             post "/api/v1/auth/login", params: { email: user.email, password: "123456" }
@@ -33,6 +34,7 @@ RSpec.describe "Auth API", type: :request do
         end
     end
 
+    # Me tests
     describe "GET /api/v1/auth/me" do
         it "returns 401 when not authenticated" do
             get "/api/v1/auth/me"
@@ -46,6 +48,7 @@ RSpec.describe "Auth API", type: :request do
         end
     end
 
+    # Logout tests
     describe "POST /api/v1/auth/logout" do
         it "logs out successfully" do
             post "/api/v1/auth/login", params: { email: user.email, password: "123456" }

@@ -11,9 +11,14 @@ Rails.application.routes.draw do
   # API routes
   namespace :api do
     namespace :v1 do
+      # Authentication routes
       post "auth/login", to: "auth#login"
       get "auth/me", to: "auth#me"
       post "auth/logout", to: "auth#logout"
+
+      # RBAC-protected routes
+      get "admin/ping", to: "admin#ping"
+      get "manager/ping", to: "manager#ping"
     end
   end
 end
