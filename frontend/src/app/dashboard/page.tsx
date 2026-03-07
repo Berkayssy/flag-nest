@@ -1,21 +1,81 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin, isManagerOrAdmin } from "@/lib/rbac";
+import { featureFlagsApi, type FeatureFlag } from "@/lib/feature-flags-api";
 
 export default function DashboardPage() {
+    // State for auth
     const router = useRouter();
     const { user, loading, logout } = useAuth();
 
+    // State for feature flags
+    const [ flags, setFlags ] = useState<FeatureFlag[]>([]);
+    const [ flagsLoading, setFlagsLoading ] = useState(true);
+    const [ flagsError, setFlagsError ] = useState("");
+
+    const [ name, setName ] = useState("");
+    const [ key, setKey ] = useState("");
+    const [ enabled, setEnabled ] = useState(false);
+    const [ description, setDescription ] = useState("");
+    const [ creating, setCreating ] = useState(false);
+
+    // Hide-hidden create form
+    const [ showCreate, setShowCreate ] = useState(false);
+
+    // Redirect to login if not logged in
     useEffect(() => {
         if (!loading && !user) {
             router.push("/login");
         }
     }, [loading, user, router]);
 
+    // Get feature flags list function
+    const getFlags = async () => {
+        setFlagsLoading(true);
+        setFlagsError("");
+
+        try {
+            const data = await featureFlagsApi.list();
+            setFlags(data);
+        }   catch (err) {
+            setFlagsError(err instanceof Error ? err.message : "Failed to fetch feature flags");
+        }   finally {
+            setFlagsLoading(false);
+        }
+    };
+
+    // Get feature flags on load
+    useEffect(() => {
+        if (!loading && user) {
+            getFlags();
+        }
+    }, [loading, user]);
+
+    // Create feature flag
+    const createFlag = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setCreating(true);
+        setFlagsError("");
+
+        try {
+            await featureFlagsApi.create({ name, key, enabled, description });
+            setName("");
+            setKey("");
+            setEnabled(false);
+            setDescription("");
+            await getFlags();
+        }   catch (err) {
+            setFlagsError(err instanceof Error ? err.message : "Failed to create feature flag");
+        }   finally {
+            setCreating(false);
+        }
+    };
+
+    // Loading screen
     if (loading || !user) {
         
         return (
@@ -30,6 +90,7 @@ export default function DashboardPage() {
         );
     }
     
+    {{/* Dashboard page */}}
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
             <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-6">
@@ -68,10 +129,11 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2">
                         {(isAdmin(user.role) ? (
                             <button
-                                className="px-3 py-2 text-md font-medium text-slate-700"
+                                className="px-3 py-2 text-sm font-medium text-slate-700 rounded-md border border-slate-300 transition hover:bg-slate-100 hover:text-slate-900"
                                 type="button"
+                                onClick={() => setShowCreate((prev) => !prev)}
                             >
-                                +
+                                + Create
                             </button>
                         ): null)}
                         <button
@@ -152,6 +214,48 @@ export default function DashboardPage() {
                         </section>
                     </>
                 ) : null )}
+
+                {isAdmin(user.role) && showCreate && (
+                    <form onSubmit={createFlag} className="mt-6 grid gap-3 rounded-lg border border-slate-200 bg-white p-5">
+                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Flag name" className="rounded-md border border-slate-300 px-3 py-2 text-sm" required />
+                        <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="flag_key" className="rounded-md border border-slate-300 px-3 py-2 text-sm" required />
+                        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" className="rounded-md border border-slate-300 px-3 py-2 text-sm" />
+
+                        <div className="mt-4 flex items-center justify-between">
+                            <label className="inline-flex items-center gap-2 text-sm">
+                                <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
+                                    Enabled
+                            </label>
+
+                            <button type="submit" disabled={creating} className="w-fit rounded-md bg-slate-900 px-4 py-2 text-sm text-white">
+                                {creating ? "Creating..." : "Create flag"}
+                            </button>
+                        </div>
+                    </form>
+                )}
+                
+                {/* Feature flags list */}
+                <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+                    <h3 className="text-sm font-semibold">Feature Flags</h3>
+                    {flagsLoading ? <p className="mt-2 text-sm text-slate-600">Loading flags...</p> : null}
+                    {flagsError ? <p className="mt-2 text-sm text-red-600">{flagsError}</p> : null}
+
+                    {!flagsLoading && !flagsError && (
+                        <ul className="mt-3 space-y-2">
+                            {flags.map((f) => (
+                                <li key={f.id} className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2">
+                                    <div>
+                                        <p className="text-sm font-medium">{f.name}</p>
+                                        <p className="text-xs text-slate-500">{f.key}</p>
+                                    </div>
+                                    <span className={`rounded-full px-2 py-1 text-xs ${f.enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                                        {f.enabled ? "enabled" : "disabled"}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </section>
 
                 {/* Audit Activity */}
                 <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5">

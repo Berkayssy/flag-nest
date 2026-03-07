@@ -20,6 +20,7 @@ vi.mock("@/contexts/auth-context", () => ({
   }),
 }));
 
+// Admin and manager should see "Recent Rollouts", but only admin should see "+ Create" button.
 describe("DashboardPage role-based UI", () => {
   beforeEach(() => {
     pushMock.mockClear();
@@ -29,14 +30,14 @@ describe("DashboardPage role-based UI", () => {
   it("shows admin-only '+' control for admin", () => {
     mockRole = "admin";
     render(<DashboardPage />);
-    expect(screen.getByText("+")).toBeInTheDocument();
+    expect(screen.getByText("+ Create")).toBeInTheDocument();
     expect(screen.getByText("Recent Rollouts")).toBeInTheDocument();
   });
 
   it("hides admin-only '+' control for manager but keeps manager section", () => {
     mockRole = "manager";
     render(<DashboardPage />);
-    expect(screen.queryByText("+")).not.toBeInTheDocument();
+    expect(screen.queryByText("+ Create")).not.toBeInTheDocument();
     expect(screen.getByText("Recent Rollouts")).toBeInTheDocument();
   });
 });
