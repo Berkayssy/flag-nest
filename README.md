@@ -34,6 +34,22 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
   - `isManagerOrAdmin`
 - Frontend dashboard role smoke tests (passing)
 
+
+### Step 3 (Feature Flag CRUD) `Completed`
+- Backend `FeatureFlag` model + migration
+- CRUD endpoints:
+  - `GET /api/v1/feature_flags`
+  - `POST /api/v1/feature_flags`
+  - `PATCH/PUT /api/v1/feature_flags/:id`
+  - `DELETE /api/v1/feature_flags/:id`
+- RBAC integrated into CRUD endpoints
+- Request spec:
+  - `backend/spec/requests/feature_flags_spec.rb` (passing)
+- Frontend:
+  - Feature flag API module
+  - Dashboard list + admin-only create flow
+  - Role-based UI rendering for CRUD actions
+
 ## Run Locally
 
 ### Backend
@@ -54,7 +70,7 @@ npm run dev
 ## Testing
 ```bash
 cd backend
-bundle exec rspec spec/requests/auth_spec.rb
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb
 ```
 
 ```bash
@@ -76,7 +92,7 @@ npm run build
 ## Roadmap
 1. Auth & Cookie `OK`
 2. RBAC `OK`
-3. Feature Flag CRUD
+3. Feature Flag CRUD `OK`
 4. Rollout rules
 5. Audit log
 6. Security hardening

@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   # API routes
   namespace :api do
     namespace :v1 do
+      # Feature flag routes
+      resources :feature_flags, only: %i[index create update destroy]
+
       # Authentication routes
       post "auth/login", to: "auth#login"
       get "auth/me", to: "auth#me"
