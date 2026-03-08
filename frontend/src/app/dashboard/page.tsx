@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin, isManagerOrAdmin } from "@/lib/rbac";
 import { featureFlagsApi, type FeatureFlag } from "@/lib/feature-flags-api";
+import type { RolloutRule } from "@/types/rollout-rule";
+import { listRolloutRules, createRolloutRule, updateRolloutRule, deleteRolloutRule } from "@/lib/rollout-rules-api";
 
 export default function DashboardPage() {
     // State for auth
@@ -22,6 +24,19 @@ export default function DashboardPage() {
     const [ enabled, setEnabled ] = useState(false);
     const [ description, setDescription ] = useState("");
     const [ creating, setCreating ] = useState(false);
+
+    // State for rollout rules
+    const [ selectedFlagId, setSelectedFlagId ] = useState<number | null>(null);
+    const [ rules, setRules ] = useState<RolloutRule[]>([]);
+    const [ rulesLoading, setRulesLoading ] = useState(false);
+    const [ rulesError, setRulesError ] = useState("");
+
+    const [ showCreateRule, setShowCreateRule ] = useState(false);
+    const [ newPercentage, setNewPercentage ] = useState("50");
+    const [ newActive, setNewActive ] = useState(true);
+
+    const canReadRules = isManagerOrAdmin(user?.role);
+    const canWriteRules = isAdmin(user?.role);
 
     // Hide-hidden create form
     const [ showCreate, setShowCreate ] = useState(false);
@@ -75,6 +90,68 @@ export default function DashboardPage() {
         }
     };
 
+    // Load rollout rules, if feature flag is selected and user has permission
+    const loadRules = useCallback(async ( featureFlagId: number ) => {
+        setRulesLoading(true);
+        setRulesError("");
+        try {
+            const data = await listRolloutRules(featureFlagId);
+            setRules(data);
+        }   catch (err) {
+            setRulesError(err instanceof Error ? err.message : "Failed to fetch rollout rules");
+        }   finally {
+            setRulesLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!selectedFlagId || selectedFlagId < 1 || !canReadRules) return;
+        loadRules(selectedFlagId);
+    },  [selectedFlagId, canReadRules, loadRules]);
+
+    async function onCreateRule(e: React.FormEvent) {
+        e.preventDefault();
+        if (!selectedFlagId) return;
+
+        const percentage = Number(newPercentage);
+        if (Number.isNaN(percentage) || percentage < 0 || percentage > 100) return;
+
+        try {
+            await createRolloutRule(selectedFlagId, { 
+                rule_type: "percentage",
+                value: null,
+                percentage,
+                active: newActive
+            });
+            setShowCreateRule(false);
+            setNewPercentage("50");
+            setNewActive(true);
+            await loadRules(selectedFlagId);
+        }   catch (err) {
+            setRulesError(err instanceof Error ? err.message : "Failed to create rollout rule");
+        }
+    }
+
+    async function onToggleRule(rule: RolloutRule) {
+        if (!canWriteRules || !selectedFlagId) return;
+        try {
+            await updateRolloutRule(rule.id, { active: !rule.active });
+            await loadRules(selectedFlagId);
+        }   catch (err) {
+            setRulesError(err instanceof Error ? err.message : "Failed to update rollout rule");
+        }
+    }
+
+    async function onDeleteRule(ruleId: number) {
+        if (!canWriteRules || !selectedFlagId) return;
+        try {
+            await deleteRolloutRule(ruleId);
+            await loadRules(selectedFlagId);
+        }   catch (err) {
+            setRulesError(err instanceof Error ? err.message : "Failed to delete rollout rule");
+        }
+    }
+
     // Loading screen
     if (loading || !user) {
         
@@ -90,7 +167,6 @@ export default function DashboardPage() {
         );
     }
     
-    {{/* Dashboard page */}}
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
             <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-6">
@@ -217,6 +293,7 @@ export default function DashboardPage() {
 
                 {isAdmin(user.role) && showCreate && (
                     <form onSubmit={createFlag} className="mt-6 grid gap-3 rounded-lg border border-slate-200 bg-white p-5">
+                        <h3 className="text-sm font-semibold">Create a new flag</h3>
                         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Flag name" className="rounded-md border border-slate-300 px-3 py-2 text-sm" required />
                         <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="flag_key" className="rounded-md border border-slate-300 px-3 py-2 text-sm" required />
                         <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description" className="rounded-md border border-slate-300 px-3 py-2 text-sm" />
@@ -256,6 +333,100 @@ export default function DashboardPage() {
                         </ul>
                     )}
                 </section>
+
+                {canReadRules && (
+                    <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold">Rollout Rules</h3>
+                            { canWriteRules && (
+                                <button type="button" onClick={() => setShowCreateRule((prev) => !prev)} className="rounded-md border border-slate-300 px-3 py-1 text-xs text-slate-700 hover:bg-slate-100">
+                                    {showCreateRule ? "Close" : "+ Add Rule"}
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="mt-3">
+                            <label className="text-xs text-slate-600"> Selected flag id</label>
+                            <input 
+                                type="number"
+                                value={selectedFlagId ?? ""}
+                                onChange={(e) => setSelectedFlagId(Number(e.target.value) || null)}
+                                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                placeholder="Feature flag id"
+                            />
+                        </div>
+
+                        {canWriteRules && showCreateRule && (
+                            <form onSubmit={onCreateRule} className="mt-3 grid gap-2 sm:grid-cols-3">
+                                <input 
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    value={newPercentage}
+                                    onChange={(e) => setNewPercentage(e.target.value)}
+                                    className="rounded-md border border-slate-300 px-2 py-1 text-sm"
+                                    placeholder="Percentage"
+                                />
+
+                                <label className="flex items-center gap-2 text-sm text-slate-700">
+                                    <input 
+                                        type="checkbox"
+                                        checked={newActive}
+                                        onChange={(e) => setNewActive(e.target.checked)}
+                                    />
+                                    Active
+                                </label>
+                                    <button 
+                                        type="submit" 
+                                        className="rounded-md bg-slate-900 px-3 py-1 text-sm text-white hover:bg-slate-700"
+                                    >
+                                        Save
+                                    </button>
+                            </form>
+                            
+                        )}
+
+                        {rulesLoading && <p className="mt-3 text-sm text-slate-600">Loading rules...</p>}
+                        {rulesError && <p className="mt-3 text-sm text-rose-600">{rulesError}</p>}
+
+                        {!rulesLoading && !rulesError && (
+                            <div className="mt-3 space-y-2">
+                                {rules.length === 0 ? (
+                                    <p className="text-sm text-slate-500">No rollout rules yet.</p>
+                                    ) : (
+                                    rules.map((r) => (
+                                        <div
+                                            key={r.id}
+                                            className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                            <p className="text-sm text-slate-800">
+                                                {r.rule_type} - {r.percentage}% - {r.active ? "active" : "inactive"}
+                                            </p>
+
+                                            {canWriteRules && (
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onToggleRule(r)}
+                                                        className="text-sm text-slate-600 hover:text-slate-900"
+                                                    >
+                                                        Toggle
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => onDeleteRule(r.id)}
+                                                        className="text-sm text-rose-600 hover:text-rose-900"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </section>
+                )}
 
                 {/* Audit Activity */}
                 <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5">

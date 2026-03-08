@@ -50,6 +50,16 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
   - Dashboard list + admin-only create flow
   - Role-based UI rendering for CRUD actions
 
+## Step 4 (Rollout Rules) `Completed`
+- RolloutRule model + migration
+- RBAC-protected rollout endpoints
+- `GET /api/v1/feature_flags/:feature_flag_id/rollout_rules`
+- `POST /api/v1/feature_flags/:feature_flag_id/rollout_rules`
+- `PATCH /api/v1/rollout_rules/:id`
+- `DELETE /api/v1/rollout_rules/:id`
+- Request spec: `spec/requests/rollout_rules_spec.rb` (passing)
+- Dashboard rollout UI + frontend tests/lint/build passing
+
 ## Run Locally
 
 ### Backend
@@ -70,7 +80,7 @@ npm run dev
 ## Testing
 ```bash
 cd backend
-bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb
 ```
 
 ```bash
@@ -93,7 +103,7 @@ npm run build
 1. Auth & Cookie `OK`
 2. RBAC `OK`
 3. Feature Flag CRUD `OK`
-4. Rollout rules
+4. Rollout rules `OK`
 5. Audit log
 6. Security hardening
 7. Performance + release checklist

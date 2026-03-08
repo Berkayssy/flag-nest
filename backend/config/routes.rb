@@ -12,7 +12,12 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # Feature flag routes
-      resources :feature_flags, only: %i[index create update destroy]
+      resources :feature_flags, only: %i[index create update destroy] do
+        resources :rollout_rules, only: %i[index create]
+      end
+
+      # Rollout rule routes
+      resources :rollout_rules, only: %i[update destroy]
 
       # Authentication routes
       post "auth/login", to: "auth#login"
