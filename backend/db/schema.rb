@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_06_152041) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_07_141436) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_152041) do
     t.index ["key"], name: "index_feature_flags_on_key", unique: true
   end
 
+  create_table "rollout_rules", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.bigint "feature_flag_id", null: false
+    t.integer "percentage", null: false
+    t.string "rule_type", default: "percentage", null: false
+    t.datetime "updated_at", null: false
+    t.string "value"
+    t.index ["feature_flag_id", "active"], name: "index_rollout_rules_on_feature_flag_id_and_active"
+    t.index ["feature_flag_id"], name: "index_rollout_rules_on_feature_flag_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "company_id"
     t.datetime "created_at", null: false
@@ -36,4 +48,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_06_152041) do
     t.string "role"
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "rollout_rules", "feature_flags"
 end
