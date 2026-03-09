@@ -8,6 +8,8 @@ import { isAdmin, isManagerOrAdmin } from "@/lib/rbac";
 import { featureFlagsApi, type FeatureFlag } from "@/lib/feature-flags-api";
 import type { RolloutRule } from "@/types/rollout-rule";
 import { listRolloutRules, createRolloutRule, updateRolloutRule, deleteRolloutRule } from "@/lib/rollout-rules-api";
+import { AuditLogItem } from "@/types/audit-log";
+import { listAuditLogs } from "@/lib/audit-logs-api";
 
 export default function DashboardPage() {
     // State for auth
@@ -37,6 +39,11 @@ export default function DashboardPage() {
 
     const canReadRules = isManagerOrAdmin(user?.role);
     const canWriteRules = isAdmin(user?.role);
+
+    // State for audit logs
+    const [ auditLogs, setAuditLogs ] = useState<AuditLogItem[]>([]);
+    const [ auditLoading, setAuditLoading ] = useState(false);
+    const [ auditError, setAuditError ] = useState("");
 
     // Hide-hidden create form
     const [ showCreate, setShowCreate ] = useState(false);
@@ -151,6 +158,29 @@ export default function DashboardPage() {
             setRulesError(err instanceof Error ? err.message : "Failed to delete rollout rule");
         }
     }
+
+    // Get load audit logs functions
+    const loadAuditLogs = useCallback(async () => {
+        if (!isManagerOrAdmin(user?.role)) return;
+
+        setAuditLoading(true);
+        setAuditError("");
+
+        try {
+            const data = await listAuditLogs();
+            setAuditLogs(data);
+        }   catch (err) {
+            setAuditError(err instanceof Error ? err.message : "Failed to fetch audit logs");
+        }   finally {
+            setAuditLoading(false);
+        }
+    }, [user?.role]);
+
+    useEffect(() => {
+        if (!loading && user &&!isManagerOrAdmin(user?.role)) {
+            loadAuditLogs();
+        }
+    }, [loading, user, loadAuditLogs]);
 
     // Loading screen
     if (loading || !user) {
@@ -434,11 +464,25 @@ export default function DashboardPage() {
                         <h2 className="text-base font-semibold">Audit Activity</h2>
                         <button className="text-sm text-slate-600 hover:text-slate-900">Export</button>
                     </div>
-                    <div className="mt-4 space-y-2 text-sm text-slate-700">
-                        <p>• `admin@acme.com` enabled `new_billing_ui` for tenant `acme`</p>
-                        <p>• rollout increased from 5% → 10% (`mobile_quick_actions`)</p>
-                        <p>• `manager@acme.com` paused `smart_approval_flow` after incident check</p>
-                    </div>
+
+                    {auditLoading && <p className="mt-3 text-sm text-slate-600">Loading activity...</p>}
+                    {auditError && <p className="mt-3 text-sm text-rose-600">{auditError}</p>}
+
+                    {!auditLoading && !auditError && (
+                        <div className="mt-3 space-y-2">
+                            {auditLogs.length === 0 ? (
+                                <p className="text-sm text-slate-500">No audit activity yet.</p>
+                                ) : (
+                                auditLogs.slice(0, 8).map((l) => (
+                                    <div key={l.id} className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                        <p className="text-sm text-slate-800">
+                                           - {l.user.email} {l.action} ({l.resource_type} #{l.resource_id})
+                                        </p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </section>
             </div>
         </main>

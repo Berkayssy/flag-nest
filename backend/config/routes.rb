@@ -19,6 +19,9 @@ Rails.application.routes.draw do
       # Rollout rule routes
       resources :rollout_rules, only: %i[update destroy]
 
+      # Audit log routes
+      get :audit_logs, to: "audit_logs#index"
+
       # Authentication routes
       post "auth/login", to: "auth#login"
       get "auth/me", to: "auth#me"
