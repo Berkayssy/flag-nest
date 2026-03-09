@@ -59,4 +59,9 @@ class ApplicationController < ActionController::API
         allowed = %w[admin manager]
         render_error("Forbidden", :forbidden) unless current_user && allowed.include?(current_user.role)
     end
+
+    # Audit logging helper method
+    def log_audit!(action:, resource:, metadata: {})
+        AuditLog.create(user_id: current_user.id, action: action, resource_type: resource.class.name, resource_id: resource.id, metadata: metadata)
+    end
 end

@@ -16,6 +16,7 @@ module Api
                 rule = @feature_flag.rollout_rules.new(rollout_rule_params)
 
                 if rule.save
+                    log_audit!(action: "rollout_rule_created", resource: rule)
                     render_success(rule.as_json(only: %i[ id feature_flag_id rule_type value percentage ]), :created)
                 else
                     render_error(rule.errors.full_messages.join(", "), :unprocessable_entity)
@@ -24,6 +25,7 @@ module Api
 
             def update
                 if @rollout_rule.update(rollout_rule_params)
+                    log_audit!(action: "rollout_rule_updated", resource: @rollout_rule)
                     render_success(@rollout_rule.as_json(only: %i[ id feature_flag_id rule_type value percentage ]))
                 else
                     render_error(@rollout_rule.errors.full_messages.join(", "), :unprocessable_entity)
@@ -31,7 +33,10 @@ module Api
             end
 
             def destroy
+                deleted_id = @rollout_rule.id
                 @rollout_rule.destroy
+                AuditLog.create(user_id: current_user.id, action: "rollout_rule_deleted", resource_type: "RolloutRule", resource_id: deleted_id, metadata: {})
+
                 render_success(message: "Rollout rule deleted successfully")
             end
 

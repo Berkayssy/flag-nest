@@ -34,7 +34,6 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
   - `isManagerOrAdmin`
 - Frontend dashboard role smoke tests (passing)
 
-
 ### Step 3 (Feature Flag CRUD) `Completed`
 - Backend `FeatureFlag` model + migration
 - CRUD endpoints:
@@ -60,6 +59,14 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
 - Request spec: `spec/requests/rollout_rules_spec.rb` (passing)
 - Dashboard rollout UI + frontend tests/lint/build passing
 
+## Step 5 (Audit Log) `Completed`
+- `audit_logs` table + `AuditLog` model
+- Audit logging on feature flag and rollout create/update/delete actions
+- `GET /api/v1/audit_logs` (RBAC-protected, manager/admin)
+- Request spec: `spec/requests/audit_logs_spec.rb` (passing)
+- Dashboard Audit Activity now reads real API data
+- Frontend tests/lint/build passing
+
 ## Run Locally
 
 ### Backend
@@ -80,7 +87,7 @@ npm run dev
 ## Testing
 ```bash
 cd backend
-bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb
 ```
 
 ```bash
@@ -104,6 +111,6 @@ npm run build
 2. RBAC `OK`
 3. Feature Flag CRUD `OK`
 4. Rollout rules `OK`
-5. Audit log
+5. Audit log `OK`
 6. Security hardening
 7. Performance + release checklist

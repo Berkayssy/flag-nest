@@ -20,7 +20,7 @@ vi.mock("@/contexts/auth-context", () => ({
   }),
 }));
 
-// Admin and manager should see "Recent Rollouts", but only admin should see "+ Create" and "+ Add Rule" button.
+// Admin and manager should see "Recent Rollouts and Audit Activity", but only admin should see "+ Create" and "+ Add Rule" button.
 describe("DashboardPage role-based UI", () => {
   beforeEach(() => {
     pushMock.mockClear();
@@ -47,9 +47,21 @@ describe("DashboardPage role-based UI", () => {
     expect(screen.getByText("+ Add Rule")).toBeInTheDocument();
   });
 
-  it("does not show rollout crewate button for manager", () => {
+  it("does not show rollout create button for manager", () => {
     mockRole = "manager";
     render(<DashboardPage />);
     expect(screen.queryByText("+ Add Rule")).not.toBeInTheDocument();
+  });
+
+  it("shows audit activity for admin", () => {
+    mockRole = "admin";
+    render(<DashboardPage />);
+    expect(screen.getByText("Audit Activity")).toBeInTheDocument();
+  });
+
+  it("shows audit activity for manager", () => {
+    mockRole = "manager";
+    render(<DashboardPage />);
+    expect(screen.getByText("Audit Activity")).toBeInTheDocument();
   });
 });

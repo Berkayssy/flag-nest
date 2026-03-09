@@ -15,6 +15,7 @@ module Api
                 flag.created_by_id = current_user.id
 
                 if flag.save
+                    log_audit!(action: "feature_flag_created", resource: flag)
                     render_success(flag.as_json(only: %i[id name key enabled description created_by_id created_at updated_at]), :created)
                 else
                     render_error(flag.errors.full_messages.join(", "), :unprocessable_entity)
@@ -23,6 +24,7 @@ module Api
 
             def update
                 if @feature_flag.update(feature_flag_params)
+                    log_audit!(action: "feature_flag_updated", resource: @feature_flag)
                     render_success(@feature_flag.as_json(only: %i[id name key enabled description created_by_id created_at updated_at]))
                 else
                     render_error(@feature_flag.errors.full_messages.to_sentence, :unprocessable_entity)
@@ -30,7 +32,10 @@ module Api
             end
 
             def destroy
+                deleted_id = @feature_flag.id
                 @feature_flag.destroy
+                AuditLog.create(user_id: current_user.id, action: "feature_flag_deleted", resource_type: "FeatureFlag", resource_id: deleted_id, metadata: {})
+
                 render_success(message: "Feature flag deleted successfully")
             end
 

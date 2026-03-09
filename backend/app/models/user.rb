@@ -1,5 +1,6 @@
 class User < ApplicationRecord
     has_secure_password
+    has_many :audit_logs, dependent: :destroy # User has many audit logs
 
     ROLES = %w[employee manager admin].freeze
 
