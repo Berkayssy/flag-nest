@@ -99,7 +99,7 @@ RSpec.describe "RolloutRules API", type: :request do
 
         it "returns 201 for admin" do
             login_as(admin_user)
-            post "/api/v1/feature_flags/#{flag.id}/rollout_rules", params: { rollout_rule: { rule_type: "percentage", percentage: 50, active: true } }
+            post "/api/v1/feature_flags/#{flag.id}/rollout_rules", params: { rollout_rule: { rule_type: "percentage", percentage: 50, active: true } }, headers: csrf_headers
             expect(response).to have_http_status(:created)
         end
     end
@@ -119,7 +119,7 @@ RSpec.describe "RolloutRules API", type: :request do
 
         it "returns 200 for admin" do
             login_as(admin_user)
-            patch "/api/v1/rollout_rules/#{rule.id}", params: { rollout_rule: { percentage: 70 } }
+            patch "/api/v1/rollout_rules/#{rule.id}", params: { rollout_rule: { percentage: 70 } }, headers: csrf_headers
             expect(response).to have_http_status(:ok)
         end
     end
@@ -133,8 +133,17 @@ RSpec.describe "RolloutRules API", type: :request do
 
         it "returns 200 for admin" do
             login_as(admin_user)
-            delete "/api/v1/rollout_rules/#{rule.id}"
+            delete "/api/v1/rollout_rules/#{rule.id}", headers: csrf_headers
             expect(response).to have_http_status(:ok)
+        end
+    end
+
+    # Bad stories test for rollout rules
+    describe "Bad stories for rollout rules" do
+        it "returns 422 for too long percentage" do
+            login_as(admin_user)
+            post "/api/v1/feature_flags/#{flag.id}/rollout_rules", params: { rollout_rule: { rule_type: "percentage", percentage: 101, active: true } }, headers: csrf_headers
+            expect(response).to have_http_status(:unprocessable_content)
         end
     end
 end

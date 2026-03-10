@@ -52,11 +52,32 @@ RSpec.describe "Auth API", type: :request do
     describe "POST /api/v1/auth/logout" do
         it "logs out successfully" do
             post "/api/v1/auth/login", params: { email: user.email, password: "123456" }
-            post "/api/v1/auth/logout"
+            post "/api/v1/auth/logout", headers: csrf_headers
             expect(response).to have_http_status(:ok)
 
             get "/api/v1/auth/me"
             expect(response).to have_http_status(:unauthorized)
+        end
+    end
+
+    # CSRF and rate-limit tests
+    describe "CSRF" do
+        it "returns 403 for invalid CSRF token" do
+            post "/api/v1/auth/login", params: { email: user.email, password: "123456" }
+            post "/api/v1/auth/logout", headers: { "X-CSRF-Token": "invalid_token" }
+            expect(response).to have_http_status(:forbidden)
+        end
+
+        it "returns 429 for after too many failed login attempts" do
+            Rails.cache.clear
+
+            5.times do
+                post "/api/v1/auth/login", params: { email: user.email, password: "wrong" }
+                expect(response).to have_http_status(:unauthorized)
+            end
+
+            post "/api/v1/auth/login", params: { email: user.email, password: "wrong" }
+            expect(response).to have_http_status(:too_many_requests)
         end
     end
 end

@@ -87,13 +87,13 @@ RSpec.describe "FeatureFlags API", type: :request do
 
         it "returns 403 for manager" do
             login_as(manager_user)
-            post "/api/v1/feature_flags", params: { feature_flag: valid_params }
+            post "/api/v1/feature_flags", params: { feature_flag: valid_params }, headers: csrf_headers
             expect(response).to have_http_status(:forbidden)
         end
 
         it "returns 201 for admin" do
             login_as(admin_user)
-            post "/api/v1/feature_flags", params: { feature_flag: valid_params }
+            post "/api/v1/feature_flags", params: { feature_flag: valid_params }, headers: csrf_headers
             expect(response).to have_http_status(:created)
         end
     end
@@ -102,13 +102,13 @@ RSpec.describe "FeatureFlags API", type: :request do
     describe "PATCH /api/v1/feature_flags/:id" do
         it "returns 403 for manager" do
             login_as(manager_user)
-            patch "/api/v1/feature_flags/#{flag.id}", params: { feature_flag: { enabled: true } }
+            patch "/api/v1/feature_flags/#{flag.id}", params: { feature_flag: { enabled: true } }, headers: csrf_headers
             expect(response).to have_http_status(:forbidden)
         end
 
         it "returns 200 for admin" do
             login_as(admin_user)
-            patch "/api/v1/feature_flags/#{flag.id}", params: { feature_flag: { enabled: true } }
+            patch "/api/v1/feature_flags/#{flag.id}", params: { feature_flag: { enabled: true } }, headers: csrf_headers
             expect(response).to have_http_status(:ok)
         end
     end
@@ -117,14 +117,29 @@ RSpec.describe "FeatureFlags API", type: :request do
     describe "DELETE /api/v1/feature_flags/:id" do
         it "returns 403 for manager" do
             login_as(manager_user)
-            delete "/api/v1/feature_flags/#{flag.id}"
+            delete "/api/v1/feature_flags/#{flag.id}", headers: csrf_headers
             expect(response).to have_http_status(:forbidden)
         end
 
         it "returns 200 for admin" do
             login_as(admin_user)
-            delete "/api/v1/feature_flags/#{flag.id}"
+            delete "/api/v1/feature_flags/#{flag.id}", headers: csrf_headers
             expect(response).to have_http_status(:ok)
+        end
+    end
+
+    # Bad stories test for feature flags
+    describe "Bad stories for feature flags" do
+        it "returns 422 for too long name" do
+            login_as(admin_user)
+            post "/api/v1/feature_flags", params: { feature_flag: { name: "a" * 256, key: "new_billing_ui_x", enabled: false, description: "x" } }, headers: csrf_headers
+            expect(response).to have_http_status(:unprocessable_content)
+        end
+
+        it "returns 422 for invalid key format" do
+            login_as(admin_user)
+            post "/api/v1/feature_flags", params: { feature_flag: { name: "New Billing UI", key: "bad_key!", enabled: false, description: "x" } }, headers: csrf_headers
+            expect(response).to have_http_status(:unprocessable_content)
         end
     end
 end

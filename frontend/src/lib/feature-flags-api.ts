@@ -1,26 +1,19 @@
-export interface FeatureFlag {
-    id: number;
-    name: string;
-    key: string;
-    enabled: boolean;
-    description?: string;
-    created_by_id: number;
-    created_at: string;
-    updated_at: string;
-}
+import { ApiError, ApiSuccess, FeatureFlag } from "@/types/feature-flag";
+import { csrfHeaders } from "@/lib/csrf";
 
-interface ApiSuccess<T> {
-    data: T;
-}
-
-interface ApiError {
-    error: string;
-}
+const API_BASE_URL = "/api/v1";
 
 async function request<T>( path: string, init?: RequestInit ) : Promise<T> {
-    const response = await fetch(`/api/v1/${path}`, {
+    const method = (init?.method || "GET").toUpperCase();
+    const needCsrf = method !== "GET" && method !== "HEAD" && method !== "OPTIONS";
+
+    const response = await fetch(`${API_BASE_URL}${path}`, {
         credentials: 'include',
-        headers: { "Conbtent-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            ...(needCsrf ? csrfHeaders() : {}),
+            ...(init?.headers || {}),
+        },
         ...init,
     });
 
@@ -41,7 +34,7 @@ async function request<T>( path: string, init?: RequestInit ) : Promise<T> {
 export const featureFlagsApi = {
     list: () => request<FeatureFlag[]>("/feature_flags"),
     create: ( body: { name: string; key: string; enabled: boolean; description?: string }) =>
-        request<FeatureFlag>("/feature-flags", {
+        request<FeatureFlag>("/feature_flags", {
             method: "POST",
             body: JSON.stringify({ feature_flag: body }),
         }

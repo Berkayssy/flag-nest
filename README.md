@@ -67,6 +67,14 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
 - Dashboard Audit Activity now reads real API data
 - Frontend tests/lint/build passing
 
+## Step 6 (Security Hardening) `Completed`
+- Login rate‑limit (5 attempts / 10 min)
+- CSRF protection via header + `_csrf_token` cookie
+- FeatureFlag validations tightened
+- Bad‑case request specs added
+- Frontend API clients now send CSRF header
+- Tests/lint/build passing
+
 ## Run Locally
 
 ### Backend
@@ -112,5 +120,5 @@ npm run build
 3. Feature Flag CRUD `OK`
 4. Rollout rules `OK`
 5. Audit log `OK`
-6. Security hardening
+6. Security hardening `OK`
 7. Performance + release checklist

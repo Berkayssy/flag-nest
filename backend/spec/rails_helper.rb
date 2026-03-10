@@ -70,3 +70,18 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
+
+# CSRF token for requests
+module RequestCsrfHelper
+  def csrf_token
+    @csrf_token || response.cookies["_csrf_token"]
+  end
+
+  def csrf_headers
+    { "X-CSRF-Token" => csrf_token }
+  end
+end
+
+RSpec.configure do |config|
+  config.include RequestCsrfHelper, type: :request
+end
