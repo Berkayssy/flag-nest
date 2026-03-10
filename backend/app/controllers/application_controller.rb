@@ -2,6 +2,7 @@ class ApplicationController < ActionController::API
     # Include cookie handling for authentication
     include ActionController::Cookies
     before_action :authenticate_request
+    before_action :verify_csrf_header!
 
     private
 
@@ -63,5 +64,15 @@ class ApplicationController < ActionController::API
     # Audit logging helper method
     def log_audit!(action:, resource:, metadata: {})
         AuditLog.create(user_id: current_user.id, action: action, resource_type: resource.class.name, resource_id: resource.id, metadata: metadata)
+    end
+
+    # CSRF protection
+    def verify_csrf_header!
+        return if request.get? || request.head? || request.options?
+
+        csrf = request.headers["X-CSRF-Token"].to_s
+        return if csrf.present? && csrf == cookies[:_csrf_token]
+
+        render_error("Invalid CSRF token", :forbidden)
     end
 end

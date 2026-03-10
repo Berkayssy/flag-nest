@@ -1,4 +1,5 @@
 import type { RolloutRule, CreateRolloutRuleInput, UpdateRolloutRuleInput } from "@/types/rollout-rule";
+import { csrfHeaders } from "./csrf";
 
 // Shared response parser: keeps JSON/error handling in one place to avoid repeating the same logic in each API function.
 async function readJson<T>(res: Response): Promise<T> {
@@ -26,6 +27,7 @@ export async function createRolloutRule(featureFlagId: number, input: CreateRoll
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            ...csrfHeaders(),
         },
         body: JSON.stringify({ rollout_rule: input }),
     });
@@ -40,6 +42,7 @@ export async function updateRolloutRule( id: number, input: UpdateRolloutRuleInp
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
+            ...csrfHeaders(),
         },
         body: JSON.stringify({ rollout_rule: input }),
     });
@@ -52,6 +55,9 @@ export async function deleteRolloutRule(id: number): Promise<void> {
     const res = await fetch(`/api/v1/rollout_rules/${id}`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+            ...csrfHeaders(),
+        }
     });
 
     await readJson<{ data: { deleted?: boolean; message?: string }}>(res);

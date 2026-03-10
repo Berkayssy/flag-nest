@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { isAdmin, isManagerOrAdmin } from "@/lib/rbac";
-import { featureFlagsApi, type FeatureFlag } from "@/lib/feature-flags-api";
+import { featureFlagsApi } from "@/lib/feature-flags-api";
+import type { FeatureFlag } from "@/types/feature-flag";
 import type { RolloutRule } from "@/types/rollout-rule";
 import { listRolloutRules, createRolloutRule, updateRolloutRule, deleteRolloutRule } from "@/lib/rollout-rules-api";
-import { AuditLogItem } from "@/types/audit-log";
+import type { AuditLogItem } from "@/types/audit-log";
 import { listAuditLogs } from "@/lib/audit-logs-api";
 
 export default function DashboardPage() {

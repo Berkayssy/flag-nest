@@ -71,7 +71,7 @@ RSpec.describe "AuditLogs API", type: :request do
                     enabled: false,
                     description: "created for audit test"
                 }
-            }
+            }, headers: csrf_headers
             expect(response).to have_http_status(:created)
 
             get "/api/v1/audit_logs"
