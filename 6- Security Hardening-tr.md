@@ -48,5 +48,6 @@ Kritik endpointleri daha güvenli hale getirmek için CSRF koruması ve rate‑l
 ## Benim Özetim
 Güvenlik katmanı güçlendirildi. Kritik endpointler CSRF ve rate‑limit ile koruma altına alındı.
 
+
 ## Benim Geliştirme Algoritmam
 `security -> input hardening -> test -> doğrulama -> push`
