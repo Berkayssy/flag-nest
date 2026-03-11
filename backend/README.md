@@ -1,24 +1,39 @@
-# README
+# Flag Nest Backend (Rails API)
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails API for authentication, RBAC, feature flags, rollout rules, and audit logs.
 
-Things you may want to cover:
+## Requirements
+- Ruby 3.2+
+- Bundler
+- PostgreSQL
 
-* Ruby version
+## Setup
+```bash
+cd backend
+bundle install
+bin/rails db:create db:migrate
+```
 
-* System dependencies
+Optional (demo data):
+```bash
+bin/rails db:seed
+```
 
-* Configuration
+## Run
+```bash
+bin/rails s -p 3001
+```
 
-* Database creation
+## Test
+```bash
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb
+```
 
-* Database initialization
+## Environment
+- `DATABASE_URL` (optional, local can use `config/database.yml`)
+- `secret_key_base` (Rails credentials for JWT signing)
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## Notes
+- Auth is JWT stored in HttpOnly cookie.
+- CSRF is enforced on write requests via `X-CSRF-Token`.
+- Rate limit applies to login attempts.

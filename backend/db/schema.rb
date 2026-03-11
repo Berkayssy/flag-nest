@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_08_180435) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_11_151000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -63,5 +63,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_08_180435) do
   end
 
   add_foreign_key "audit_logs", "users"
+  add_foreign_key "feature_flags", "users", column: "created_by_id"
   add_foreign_key "rollout_rules", "feature_flags"
 end
