@@ -15,6 +15,7 @@ To demonstrate production‑minded full‑stack engineering: secure auth, RBAC, 
 - Auth: JWT in HttpOnly cookie
 - Security: CSRF for write requests, login rate‑limit
 - Audit: log create/update/delete on critical resources
+- Scope: current MVP is the control plane (management UI + API). Evaluation/delivery SDK is out of scope for now.
 
 ## API Endpoints (v1)
 - Auth: `POST /auth/login`, `GET /auth/me`, `POST /auth/logout`
@@ -43,7 +44,7 @@ npm run dev
 Backend:
 ```bash
 cd backend
-bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb spec/requests/flag_evaluations_spec
 ```
 
 Frontend:
@@ -62,6 +63,7 @@ npm run build
 - `5- Audit Log-*.md`
 - `6- Security Hardening-*.md`
 - `7- Performance & Release Checklist-*.md`
+- `E1- Evaluation API-*.md`
 - `Final - Production Ready-*.md`
 
 ## Environment
@@ -76,6 +78,9 @@ Frontend:
 - localhost(line 3001)
 
 ## Roadmap
+
+### P1
+
 1. Auth & Cookie `OK`
 2. RBAC `OK`
 3. Feature Flag CRUD `OK`
@@ -83,3 +88,9 @@ Frontend:
 5. Audit log `OK`
 6. Security hardening `OK`
 7. Performance + release checklist `OK`
+
+### P2
+
+1. E1 `OK`
+2. E2
+3. E3

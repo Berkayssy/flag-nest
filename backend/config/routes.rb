@@ -16,6 +16,9 @@ Rails.application.routes.draw do
         resources :rollout_rules, only: %i[index create]
       end
 
+      # Evelution routes
+      get "flags/:key/evaluate", to: "flag_evaluations#evaluate"
+
       # Rollout rule routes
       resources :rollout_rules, only: %i[update destroy]
 
