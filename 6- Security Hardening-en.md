@@ -1,6 +1,6 @@
 # Security Hardening
 
-## Goal
+## Purpose
 Harden critical endpoints with CSRF protection and rate‑limiting, and tighten input validations.
 
 ## My Development Flow
