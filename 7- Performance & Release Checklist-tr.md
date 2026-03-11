@@ -34,5 +34,6 @@ Performans gözden geçirmesi yapmak ve release öncesi net bir kontrol listesi 
 ## Benim Özetim
 Performans gözden geçirmesi yapıldı ve release için kontrol listesi hazırlandı.
 
+
 ## Benim Geliştirme Algoritmam
 `performans -> kontrol listesi -> test -> doğrulama -> release`
