@@ -4,7 +4,11 @@ module Api
             before_action :require_manager_or_admin!
 
             def index
-                logs = AuditLog.includes(:user).order(created_at: :desc).limit(100)
+                logs = AuditLog
+                    .select(:id, :action, :resource_type, :resource_id, :metadata, :created_at, :user_id)
+                    .includes(:user)
+                    .order(created_at: :desc)
+                    .limit(100)
 
                 render_success(
                     logs.map do |log| # map log for stable/safe response and leaking model fields

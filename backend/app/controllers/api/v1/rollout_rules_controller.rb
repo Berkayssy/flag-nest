@@ -8,8 +8,10 @@ module Api
             before_action :set_rollout_rule, only: %i[update destroy]
 
             def index
-                rules = @feature_flag.rollout_rules.order(created_at: :desc)
-                render_success(rules.as_json(only: %i[ id feature_flag_id rule_type value percentage ]))
+                rules = @feature_flag.rollout_rules
+                    .select(:id, :feature_flag_id, :rule_type, :value, :percentage, :active, :created_at)
+                    .order(created_at: :desc)
+                render_success(rules.as_json(only: %i[ id feature_flag_id rule_type value percentage active ]))
             end
 
             def create

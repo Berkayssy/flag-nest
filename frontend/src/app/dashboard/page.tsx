@@ -178,7 +178,7 @@ export default function DashboardPage() {
     }, [user?.role]);
 
     useEffect(() => {
-        if (!loading && user &&!isManagerOrAdmin(user?.role)) {
+        if (!loading && user && isManagerOrAdmin(user.role)) {
             loadAuditLogs();
         }
     }, [loading, user, loadAuditLogs]);
@@ -380,8 +380,18 @@ export default function DashboardPage() {
                             <label className="text-xs text-slate-600"> Selected flag id</label>
                             <input 
                                 type="number"
+                                min={1}
+                                step={1}
                                 value={selectedFlagId ?? ""}
-                                onChange={(e) => setSelectedFlagId(Number(e.target.value) || null)}
+                                onChange={(e) => {
+                                    const raw = e.target.value;
+                                    if (raw === "") {
+                                        setSelectedFlagId(null);
+                                        return;
+                                    }
+                                    const parsed = Number(raw);
+                                    setSelectedFlagId(Number.isNaN(parsed) || parsed < 1 ? null : parsed);
+                                }}
                                 className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                                 placeholder="Feature flag id"
                             />

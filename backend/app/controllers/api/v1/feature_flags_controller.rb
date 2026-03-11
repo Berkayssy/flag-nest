@@ -6,7 +6,9 @@ module Api
             before_action :require_admin!, only: %i[create update destroy]
 
             def index
-                flags = FeatureFlag.order(created_at: :desc)
+                flags = FeatureFlag
+                    .select(:id, :name, :key, :enabled, :description, :created_by_id, :created_at, :updated_at)
+                    .order(created_at: :desc)
                 render_success(flags.as_json(only: %i[id name key enabled description created_by_id created_at updated_at]))
             end
 

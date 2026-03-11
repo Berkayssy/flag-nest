@@ -75,6 +75,13 @@ Feature flag and rollout-focused SaaS infrastructure (Rails API + Next.js fronte
 - Frontend API clients now send CSRF header
 - Tests/lint/build passing
 
+## Step 7 (Performance & Release Checklist) `Completed`
+- Select‑only fields on list endpoints
+- Audit log list limited + includes to avoid N+1
+- Frontend audit fetch condition fixed
+- Release checklist added
+- Tests/lint/build passing
+
 ## Run Locally
 
 ### Backend
@@ -121,4 +128,4 @@ npm run build
 4. Rollout rules `OK`
 5. Audit log `OK`
 6. Security hardening `OK`
-7. Performance + release checklist
+7. Performance + release checklist `OK`
