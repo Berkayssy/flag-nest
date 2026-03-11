@@ -44,7 +44,7 @@ npm run dev
 Backend:
 ```bash
 cd backend
-bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb spec/requests/flag_evaluations_spec
+bundle exec rspec spec/requests/auth_spec.rb spec/requests/rbac_spec.rb spec/requests/feature_flags_spec.rb spec/requests/rollout_rules_spec.rb spec/requests/audit_logs_spec.rb spec/requests/flag_evaluations_spec.rb
 ```
 
 Frontend:
@@ -64,6 +64,7 @@ npm run build
 - `6- Security Hardening-*.md`
 - `7- Performance & Release Checklist-*.md`
 - `E1- Evaluation API-*.md`
+- `E2- Delivery Auth-*.md`
 - `Final - Production Ready-*.md`
 
 ## Environment
@@ -92,5 +93,5 @@ Frontend:
 ### P2
 
 1. E1 `OK`
-2. E2
+2. E2 `OK`
 3. E3

@@ -3,6 +3,7 @@ module Api
         class FlagEvaluationsController < ApplicationController
             skip_before_action :authenticate_request
             skip_before_action :verify_csrf_header!
+            before_action :require_delivery_token!
 
             def evaluate
                 key = params[:key].to_s
@@ -18,6 +19,18 @@ module Api
                 bucket = (Zlib.crc32(user_id) % 100)
                 enabled = bucket < rule.percentage
                 render_success({ enabled: enabled, reason: "percentage" })
+            end
+
+            private
+
+            def require_delivery_token!
+                expected = ENV["DELIVERY_API_KEY"].to_s
+                auth = request.headers["Authorization"].to_s
+                token = auth.sub(/^Bearer\s+/i, "").strip
+
+                return render_error("Unauthorized", :unauthorized) if expected.empty?
+                return render_error("Unauthorized", :unauthorized) if token.empty?
+                return render_error("Unauthorized", :unauthorized) unless ActiveSupport::SecurityUtils.secure_compare(token, expected)
             end
         end
     end
