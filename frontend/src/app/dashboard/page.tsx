@@ -377,24 +377,22 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="mt-3">
-                            <label className="text-xs text-slate-600"> Selected flag id</label>
-                            <input 
-                                type="number"
-                                min={1}
-                                step={1}
+                            <label className="text-xs text-slate-600">Selected flag</label>
+                            <select
                                 value={selectedFlagId ?? ""}
                                 onChange={(e) => {
                                     const raw = e.target.value;
-                                    if (raw === "") {
-                                        setSelectedFlagId(null);
-                                        return;
-                                    }
-                                    const parsed = Number(raw);
-                                    setSelectedFlagId(Number.isNaN(parsed) || parsed < 1 ? null : parsed);
+                                    setSelectedFlagId(raw ? Number(raw) : null);
                                 }}
                                 className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                                placeholder="Feature flag id"
-                            />
+                            >
+                                <option value="">Select a flag</option>
+                                {flags.map((f) => (
+                                    <option key={f.id} value={f.id}>
+                                        {f.name} ({f.key})
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         {canWriteRules && showCreateRule && (

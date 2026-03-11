@@ -1,6 +1,6 @@
 class User < ApplicationRecord
     has_secure_password
-    has_many :audit_logs, dependent: :destroy # User has many audit logs
+    has_many :audit_logs, dependent: :restrict_with_error # Keep audit history even if user is deleted
 
     ROLES = %w[employee manager admin].freeze
 

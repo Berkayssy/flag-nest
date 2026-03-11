@@ -46,15 +46,11 @@ module Api
 
             def set_feature_flag
                 @feature_flag = FeatureFlag.find_by(id: params[:feature_flag_id])
-                return if @feature_flag
-
                 render_error("Feature flag not found", :not_found) unless @feature_flag
             end
 
             def set_rollout_rule
                 @rollout_rule = RolloutRule.find_by(id: params[:id])
-                return if @rollout_rule
-
                 render_error("Rollout rule not found", :not_found) unless @rollout_rule
             end
 

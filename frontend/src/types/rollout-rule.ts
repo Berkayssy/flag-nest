@@ -2,7 +2,7 @@ export type RolloutRuleType = "percentage";
 
 export interface RolloutRule {
     id: number;
-    feature_flag_id: string;
+    feature_flag_id: number;
     rule_type: RolloutRuleType;
     value: string | null;
     percentage: number;
