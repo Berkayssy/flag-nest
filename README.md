@@ -56,17 +56,17 @@ npm run build
 ```
 
 ## Docs
-- `1- Auth&Cookie System-*.md`
-- `2- RBAC System-*.md`
-- `3- CRUD System (Feature Flag)-*.md`
-- `4- Rollout Rules-*.md`
-- `5- Audit Log-*.md`
-- `6- Security Hardening-*.md`
-- `7- Performance & Release Checklist-*.md`
-- `E1- Evaluation API-*.md`
-- `E2- Delivery Auth-*.md`
-- `E3- Minimal Client + Demo-*.md`
-- `Final - Production Ready-*.md`
+- `roadmap-docs/P1/1- Auth&Cookie System-*.md`
+- `roadmap-docs/P1/2- RBAC System-*.md`
+- `roadmap-docs/P1/3- CRUD System (Feature Flag)-*.md`
+- `roadmap-docs/P1/4- Rollout Rules-*.md`
+- `roadmap-docs/P1/5- Audit Log-*.md`
+- `roadmap-docs/P1/6- Security Hardening-*.md`
+- `roadmap-docs/P1/7- Performance & Release Checklist-*.md`
+- `roadmap-docs/P2/E1- Evaluation API-*.md`
+- `roadmap-docs/P2/E2- Delivery Auth-*.md`
+- `roadmap-docs/P2/E3- Minimal Client + Demo-*.md`
+- `roadmap-docs/FINAL - Production Ready Polish-*.md`
 
 ## Environment
 Backend:
