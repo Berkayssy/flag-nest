@@ -65,6 +65,7 @@ npm run build
 - `7- Performance & Release Checklist-*.md`
 - `E1- Evaluation API-*.md`
 - `E2- Delivery Auth-*.md`
+- `E3- Minimal Client + Demo-*.md`
 - `Final - Production Ready-*.md`
 
 ## Environment
@@ -94,4 +95,4 @@ Frontend:
 
 1. E1 `OK`
 2. E2 `OK`
-3. E3
+3. E3 `OK`
